@@ -1,0 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+/* Global Styles */
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	font-family: "Inter", sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+	color: var(--text-color);
+	background-color: var(--background-color);
+}
+
+/* Light Theme */
+:root {
+	--background-color: #ffffff;
+	--secundary-background-color: #fcfaf8;
+	--surface-color: #f4f4f4;
+	--text-color: #202020;
+	--primary-color: #db4c3f; /* Todoist Red */
+	--accent-color: #fbd38d; /* Light Yellow */
+	--border-color: #e0e0e0;
+	--hover-color: #ffefe5;
+	--hover-color-link: #f2efed;
+	--active-color: #ffefe5;
+	--priority-1: #e44332;
+	--priority-2: #eb8909;
+	--priority-3: #246fe0;
+	--priority-4: #f1f1f1;
+}
+
+/* Dark Theme */
+.dark-theme {
+	--background-color: #1e1e1e;
+	--secundary-background-color: #252525;
+	--surface-color: #2c2c2c;
+	--text-color: #f4f4f4;
+	--primary-color: #db4c3f;
+	--accent-color: #fbd38d;
+	--border-color: #3a3a3a;
+	--hover-color: #2a2a2a;
+	--hover-color-link: #2f2f2f;
+	--active-color: #333333;
+	--priority-1: #e44332;
+	--priority-2: #eb8909;
+	--priority-3: #246fe0;
+	--priority-4: #f1f1f1;
+}
+
+/* Utility Classes */
+.hidden {
+	display: none;
+}
+
+.visible {
+	display: block;
+}
