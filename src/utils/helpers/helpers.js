@@ -13,3 +13,14 @@ export const requireAuth = (callback, router) => {
 		}
 	});
 };
+
+export const createUserAvatarFallback = (userName) => {
+	const initials = userName
+		.split(" ")
+		.map((name) => name.charAt(0).toUpperCase())
+		.join("");
+
+	const avatarUrl = `https://ui-avatars.com/api/?name=${initials}&background=random&color=fff&size=128`;
+
+	return avatarUrl;
+};

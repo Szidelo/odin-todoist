@@ -1,11 +1,22 @@
 import { auth, provider } from "../../config/firebase";
 import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import User from "../../classes/User";
 
 class AuthService {
+	_createUserInstance(firebaseUser) {
+		if (!firebaseUser) return null;
+
+		const { uid, accessToken, displayName, email, photoURL } = firebaseUser;
+		return new User(uid, accessToken, displayName, email, photoURL);
+	}
+
 	async loginWithEmail(email, password) {
 		try {
 			const userCredential = await signInWithEmailAndPassword(auth, email, password);
-			return { user: userCredential.user };
+			console.log("-----------user credential:", userCredential);
+			const user = this._createUserInstance(userCredential.user);
+			console.log("++++++++++++User logged in AuthService:", user.getUserInfo());
+			return { user };
 		} catch (error) {
 			return { error };
 		}
@@ -14,7 +25,12 @@ class AuthService {
 	async loginWithGoogle() {
 		try {
 			const userCredential = await signInWithPopup(auth, provider);
-			return { user: userCredential.user };
+			console.log("-----------user credential:", userCredential);
+
+			const user = this._createUserInstance(userCredential.user);
+			console.log("++++++++++++User logged in AuthService:", user.getUserInfo());
+
+			return { user };
 		} catch (error) {
 			return { error };
 		}
@@ -23,7 +39,8 @@ class AuthService {
 	async signupWithEmail(email, password) {
 		try {
 			const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-			return { user: userCredential.user };
+			const user = this._createUserInstance(userCredential.user);
+			return { user };
 		} catch (error) {
 			return { error };
 		}
@@ -32,14 +49,18 @@ class AuthService {
 	async signupWithGoogle() {
 		try {
 			const userCredential = await signInWithPopup(auth, provider);
-			return { user: userCredential.user };
+			const user = this._createUserInstance(userCredential.user);
+			return { user };
 		} catch (error) {
 			return { error };
 		}
 	}
 
 	onAuthChange(callback) {
-		return onAuthStateChanged(auth, callback);
+		return onAuthStateChanged(auth, (firebaseUser) => {
+			const user = this._createUserInstance(firebaseUser);
+			callback(user);
+		});
 	}
 
 	async logout() {
@@ -53,11 +74,17 @@ class AuthService {
 
 	async getCurrentUser() {
 		return new Promise((resolve) => {
-			const unsubscribe = onAuthStateChanged(auth, (user) => {
+			const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
 				unsubscribe();
-				resolve(user);
+				const user = this._createUserInstance(firebaseUser);
+				resolve(user.getUserInfo());
 			});
 		});
+	}
+
+	async isLoggedIn() {
+		const user = await this.getCurrentUser();
+		return !!user;
 	}
 }
 
