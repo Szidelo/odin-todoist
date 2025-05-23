@@ -2,22 +2,22 @@ import authService from "../modules/auth/authService";
 
 // mock function to simulate a home page rendering
 const renderHomePage = async () => {
-	const getUser = () => {
-		const user = authService.getCurrentUser();
-		return user;
-	};
+	const user = await authService.getCurrentUser();
+	const userAvatar = user?.photoURL || "https://via.placeholder.com/150";
 
-	const user = await getUser();
 	console.log("User:", user);
-	document.getElementById("content").innerHTML = `
+	const content = document.getElementById("content");
+	if (!content) return console.error("Missing #content container");
+
+	content.innerHTML = `
 		<h2>Welcome Home</h2>
+		<img src="${userAvatar}" alt="User Avatar" width="150" height="150" />
 		<p>You are logged in as ${user?.displayName || "Unknown"}!</p>
 		<button id="signout">Sign Out</button>
 	`;
-	const signoutButton = document.getElementById("signout");
-	signoutButton.addEventListener("click", () => {
-		console.log("Sign out clicked");
 
+	document.getElementById("signout")?.addEventListener("click", () => {
+		console.log("Sign out clicked");
 		authService.logout();
 		location.reload();
 	});
