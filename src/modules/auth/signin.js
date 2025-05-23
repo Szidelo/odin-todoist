@@ -1,7 +1,7 @@
 import authService from "./authService";
 
 const signin = () => {
-	const signinWithEmalAndPassword = (email, password) => {
+	const signinWithEmailAndPassword = (email, password) => {
 		authService
 			.loginWithEmail(email, password)
 			.then((res) => {
@@ -34,7 +34,7 @@ const signin = () => {
 	};
 
 	return {
-		signinWithEmalAndPassword,
+		signinWithEmailAndPassword,
 		signinWithGoogle,
 	};
 };

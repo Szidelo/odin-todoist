@@ -2,7 +2,7 @@ import signin from "../modules/auth/signin";
 
 const renderSignin = () => {
 	const signinModule = signin();
-	const { signinWithEmalAndPassword, signinWithGoogle } = signinModule;
+	const { signinWithEmailAndPassword, signinWithGoogle } = signinModule;
 	// Clear previous content
 	const app = document.getElementById("content");
 	app.innerHTML = "";
@@ -50,7 +50,7 @@ const renderSignin = () => {
 		const email = emailInput.value;
 		const password = passwordInput.value;
 		console.log("Sign up with:", email, password);
-		signinWithEmalAndPassword(email, password);
+		signinWithEmailAndPassword(email, password);
 	});
 
 	googleBtn.addEventListener("click", () => {
