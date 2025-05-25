@@ -1,4 +1,4 @@
-import authService from "../modules/auth/authService";
+import authService from "../utils/service/authService";
 
 // mock function to simulate a home page rendering
 const renderHomePage = async () => {

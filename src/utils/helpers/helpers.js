@@ -1,4 +1,4 @@
-import authService from "../../modules/auth/authService";
+import authService from "../service/authService";
 
 export const requireAuth = (callback, router) => {
 	const unsubscribe = authService.onAuthChange((user) => {
