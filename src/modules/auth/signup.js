@@ -1,4 +1,4 @@
-import authService from "../../utils/service/authService";
+import authService from "../../utils/service/AuthService";
 
 const signup = () => {
 	const signupWithEmail = async (email, password) => {

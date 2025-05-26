@@ -1,4 +1,4 @@
-import authService from "../../utils/service/authService";
+import authService from "../../utils/service/AuthService";
 
 const signin = () => {
 	const signinWithEmailAndPassword = (email, password) => {

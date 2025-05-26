@@ -6,7 +6,7 @@ class User {
 		this.accessToken = accessToken;
 		this.displayName = displayName;
 		this.email = email;
-		this.photoURL = photoURL || createUserAvatarFallback(displayName);
+		this.photoURL = photoURL || createUserAvatarFallback(displayName || email);
 		this.preferences = preferences;
 	}
 
