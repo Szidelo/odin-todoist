@@ -14,8 +14,9 @@ class ProjectService {
 			return null;
 		}
 		const data = docSnap.data();
-		const { id, name, color, userIds, isFavoriteBy, parentProjectId, childProjectIds, createdAt, updatedAt } = data;
-		const project = new Project(id, name, color, userIds, isFavoriteBy, parentProjectId, childProjectIds, createdAt, updatedAt);
+		const projectId = docSnap.id;
+		const { name, color, userIds, isFavoriteBy, parentProjectId, childProjectIds, createdAt, updatedAt } = data;
+		const project = new Project(projectId, name, color, userIds, isFavoriteBy, parentProjectId, childProjectIds, createdAt, updatedAt);
 		console.log("Project instance created:", project);
 		return project;
 	}
