@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, query, where, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where, setDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import Project from "../../classes/Project";
 import authService from "./AuthService";
@@ -68,9 +68,29 @@ class ProjectService {
 		}
 	}
 
+	async updateProject(id, updates) {
+		try {
+			const projectRef = doc(this.collectionRef, id);
+
+			const toUpdate = {
+				...updates,
+				updatedAt: serverTimestamp(),
+			};
+
+			await updateDoc(projectRef, toUpdate);
+
+			const { project, error } = await this.getProjectById(id);
+			if (error) throw error;
+			return { project };
+		} catch (error) {
+			console.error("Error updating project:", error);
+			return { error };
+		}
+	}
+
 	async deleteProject(id) {
 		try {
-			await deleteDoc(doc(this.colRef, id));
+			await deleteDoc(doc(this.collectionRef, id));
 			console.log("Project deleted succes");
 			return { success: true };
 		} catch (error) {
