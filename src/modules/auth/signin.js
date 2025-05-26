@@ -1,4 +1,5 @@
 import authService from "../../utils/service/AuthService";
+import userService from "../../utils/service/UserService";
 
 const signin = () => {
 	const signinWithEmailAndPassword = (email, password) => {
@@ -25,6 +26,8 @@ const signin = () => {
 					console.error("Error signing in with Google:", res.err);
 				} else {
 					console.log("User signed in with Google successfully:", res.user);
+					const user = res.user;
+					userService.saveUserToDB(user);
 					window.location.hash = "#/"; //redirect to home page
 				}
 			})
