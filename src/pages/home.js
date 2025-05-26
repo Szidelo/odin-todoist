@@ -22,6 +22,7 @@ const renderHomePage = async () => {
 
 	content.innerHTML = `
     <style>
+	#user-avatar {border-radius: 50%}
       #project-section { margin-top: 20px; }
       #project-list { list-style: none; padding: 0; }
       .project-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid #e0e0e0; margin-bottom: 8px; border-radius: 4px; }
@@ -34,7 +35,7 @@ const renderHomePage = async () => {
       .btn-add-user { background: #3498db; color: #fff; }
     </style>
     <h2>Welcome, ${user.displayName || user.email}!</h2>
-    <img src="${user.photoURL || "https://via.placeholder.com/150"}" alt="User Avatar" width="150" height="150" />
+    <img id="user-avatar" src="${user.photoURL} "  referrerpolicy="no-referrer"  alt="User Avatar" width="75" height="75" />
     <button id="signout">Sign Out</button>
 
     <section id="project-section">
