@@ -15,8 +15,11 @@ const renderHomePage = async () => {
 
 	const content = document.getElementById("content");
 	content.innerHTML = `
-    <h2>Welcome, ${currentUser.displayName || currentUser.email}<img class="avatar-img" src="${currentUser.photoURL}" /></h2>
-    <button id="signout">Sign Out</button>
+<div class="user-header">
+  <img class="avatar-img" src="${currentUser.photoURL}" alt="User Avatar" />
+  <h2 class="welcome-text">Welcome, ${currentUser.displayName || currentUser.email}</h2>
+  <button id="signout" class="btn-signout">Sign Out</button>
+</div>
     <section id="project-section">
       <h3>Your Projects</h3>
       <div id="projects-container"></div>
