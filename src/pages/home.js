@@ -1,198 +1,131 @@
+// src/pages/home.js
+import { onSnapshot, query, where, collection } from "firebase/firestore";
+import { db } from "../config/firebase";
 import authService from "../utils/service/AuthService";
 import projectService from "../utils/service/ProjectService";
-import userService from "../utils/service/UserService"; // new service to fetch user profiles
+import taskService from "../utils/service/TaskService,js";
+import userService from "../utils/service/UserService";
 
-// Home page rendering with project form and list
 const renderHomePage = async () => {
-	// Get current user
 	const currentUser = await authService.getCurrentUser();
 	if (!currentUser) {
-		document.getElementById("content").innerHTML = `<p>Please sign in to view your projects.</p>`;
+		document.getElementById("content").innerHTML = "<p>Please sign in.</p>";
 		return;
 	}
 
-	// Fetch projects for this user
-	const { projects, error: listError } = await projectService.listProjectsForUser(currentUser.uid);
-	if (listError) {
-		console.error("Error fetching projects:", listError);
-	}
-
-	// Gather all unique user IDs across projects (including current user)
-	const allUserIds = Array.from(new Set(projects.flatMap((p) => p.userIds).concat(currentUser.uid)));
-
-	// Fetch user profiles
-	const userProfiles = {};
-	await Promise.all(
-		allUserIds.map(async (uid) => {
-			const { user, error } = await userService.getUserById(uid);
-			if (user) userProfiles[uid] = user;
-			else console.warn(`User profile not found for UID: ${uid}`, error);
-		})
-	);
-
-	// Render form and project list
 	const content = document.getElementById("content");
-	if (!content) return console.error("Missing #content container");
-
 	content.innerHTML = `
-    <style>
-      #project-section { margin-top: 20px; }
-      #project-list { list-style: none; padding: 0; }
-      .project-item { display: flex; align-items: center; justify-content: space-between; padding: 8px; border: 1px solid #e0e0e0; margin-bottom: 8px; border-radius: 4px; }
-      .project-details { display: flex; align-items: center; gap: 8px; }
-      .project-color { width: 12px; height: 12px; border-radius: 50%; }
-      .user-list { display: flex; align-items: center; gap: 4px; margin-left: 16px; }
-      .user-list img { width: 24px; height: 24px; border-radius: 50%; }
-      .btn { padding: 4px 8px; margin-left: 4px; cursor: pointer; border: none; border-radius: 4px; }
-      .btn-delete { background: #e74c3c; color: #fff; }
-      .btn-add-user { background: #3498db; color: #fff; }
-    </style>
-    <h2>Welcome, ${currentUser.displayName || currentUser.email}!</h2>
-    <img src="${currentUser.photoURL || "https://via.placeholder.com/150"}" alt="User Avatar" width="150" height="150" />
+    <h2>Welcome, ${currentUser.displayName || currentUser.email}<img class="avatar-img" src="${currentUser.photoURL}" /></h2>
     <button id="signout">Sign Out</button>
-
     <section id="project-section">
       <h3>Your Projects</h3>
-      <ul id="project-list">
-        ${
-			projects && projects.length
-				? projects
-						.map((p) => {
-							const usersHtml = (p.userIds || [])
-								.map((uid) => {
-									const u = userProfiles[uid];
-									return `<img src='${u?.photoURL || "https://via.placeholder.com/24"}' title='${
-										u?.displayName || uid
-									}' alt='User'/>`;
-								})
-								.join("");
-							return `
-                <li class='project-item' data-id='${p.id}'>
-                  <div class='project-details'>
-                    <span class='project-color' style='background:${p.color}'></span>
-                    <span>${p.name}</span>
-                    <div class='user-list'>${usersHtml}</div>
-                  </div>
-                  <div>
-                    <button class='btn btn-add-user' data-action='add-user'>+ User</button>
-                    <button class='btn btn-delete' data-action='delete'>Delete</button>
-                  </div>
-                </li>`;
-						})
-						.join("")
-				: "<li>No projects yet.</li>"
-		}
-      </ul>
-
-      <h3>Create New Project</h3>
+      <div id="projects-container"></div>
+      <h4>Create New Project</h4>
       <form id="project-form">
-        <input type="text" id="project-name" placeholder="Project Name" required />
+        <input id="project-name" placeholder="Project Name" required />
         <input type="color" id="project-color" value="#db4c3f" />
         <button type="submit">Add Project</button>
       </form>
     </section>
   `;
 
-	// Sign out handler
-	document.getElementById("signout").addEventListener("click", async () => {
+	// Sign out
+	document.getElementById("signout").onclick = async () => {
 		await authService.logout();
 		location.reload();
-	});
+	};
 
-	// Handle project form submission
-	document.getElementById("project-form").addEventListener("submit", async (e) => {
+	// Create project
+	document.getElementById("project-form").onsubmit = async (e) => {
 		e.preventDefault();
-		const nameInput = document.getElementById("project-name");
-		const colorInput = document.getElementById("project-color");
-		const name = nameInput.value.trim();
-		const color = colorInput.value;
+		const name = document.getElementById("project-name").value.trim();
+		const color = document.getElementById("project-color").value;
 		if (!name) return;
+		await projectService.createNewProject({ name, color });
+		e.target.reset();
+	};
 
-		const { project, error } = await projectService.createNewProject({ name, color });
-		if (error) {
-			console.error("Error creating project:", error);
-			return;
-		}
+	const projectsContainer = document.getElementById("projects-container");
 
-		// Append new project to list
-		const list = document.getElementById("project-list");
-		const li = document.createElement("li");
-		li.className = "project-item";
-		li.dataset.id = project.id;
-		const usersHtml = project.userIds
-			.map((uid) => {
-				const u = userProfiles[uid];
-				return `<img src='${u?.photoURL || "https://via.placeholder.com/24"}' title='${u?.displayName || uid}' alt='User'/>`;
+	// Real-time listener for projects
+	const projectsQuery = query(collection(db, "projects"), where("userIds", "array-contains", currentUser.uid));
+	onSnapshot(projectsQuery, async (snapshot) => {
+		projectsContainer.innerHTML = ""; // clear
+		const projects = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+		// Gather all user profiles to avoid repeated calls
+		const allUserIds = [...new Set(projects.flatMap((p) => p.userIds))];
+		const profiles = {};
+		await Promise.all(
+			allUserIds.map(async (uid) => {
+				const { user } = await userService.getUserById(uid);
+				profiles[uid] = user || { displayName: uid, photoURL: "" };
 			})
-			.join("");
-		li.innerHTML = `
-      <div class='project-details'>
-        <span class='project-color' style='background:${project.color}'></span>
-        <span>${project.name}</span>
-        <div class='user-list'>${usersHtml}</div>
-      </div>
-      <div>
-        <button class='btn btn-add-user' data-action='add-user'>+ User</button>
-        <button class='btn btn-delete' data-action='delete'>Delete</button>
-      </div>
-    `;
-		list.appendChild(li);
+		);
 
-		// Clear form
-		nameInput.value = "";
-	});
+		// For each project, render its card and set up task listener
+		projects.forEach((project) => {
+			const card = document.createElement("div");
+			card.className = "project-card";
+			card.dataset.id = project.id;
+			card.innerHTML = `
+        <div class="project-header" style="border-left:4px solid ${project.color}">
+          <h4>${project.name}</h4>
+          <button class="delete-project">🗑️</button>
+        </div>
+        <div class="user-list">
+          ${project.userIds
+				.map(
+					(uid) =>
+						`<img src="${profiles[uid].photoURL || "https://via.placeholder.com/24"}" title="${profiles[uid].displayName}" />`
+				)
+				.join("")}
+        </div>
+        <ul class="task-list" id="tasks-${project.id}"></ul>
+        <form class="task-form" data-project="${project.id}">
+          <input name="task-name" placeholder="New Task" required />
+          <button type="submit">Add Task</button>
+        </form>
+      `;
+			projectsContainer.appendChild(card);
 
-	// Handle delete and add-user actions
-	document.getElementById("project-list").addEventListener("click", async (e) => {
-		const btn = e.target.closest("button");
-		if (!btn) return;
-		const action = btn.dataset.action;
-		const li = btn.closest(".project-item");
-		const projectId = li.dataset.id;
+			// Delete project
+			card.querySelector(".delete-project").onclick = async () => {
+				await projectService.deleteProject(project.id);
+			};
 
-		if (action === "delete") {
-			const { success, error } = await projectService.deleteProject(projectId);
-			if (success) {
-				li.remove();
-			} else {
-				console.error("Error deleting project:", error);
-			}
-		} else if (action === "add-user") {
-			const newUserId = prompt("Enter user UID to add:");
-			if (!newUserId) return;
+			// Task form
+			card.querySelector(".task-form").onsubmit = async (e) => {
+				e.preventDefault();
+				const projectId = e.target.dataset.project;
+				const name = e.target.elements["task-name"].value.trim();
+				if (!name) return;
+				await taskService.createNewTask({ name, description: "", dueDate: null, priority: 4, projectId });
+				e.target.reset();
+			};
 
-			// Fetch current project data
-			const { project, error: getError } = await projectService.getProjectById(projectId);
-			if (getError || !project) {
-				console.error("Error fetching project:", getError);
-				return;
-			}
-
-			// Check if user already associated
-			if (project.userIds.includes(newUserId)) {
-				alert("User already in project");
-				return;
-			}
-
-			// Update userIds array
-			const updatedUserIds = [...project.userIds, newUserId];
-			const { project: updatedProject, error: updateError } = await projectService.updateProject(projectId, {
-				userIds: updatedUserIds,
+			// Real-time listener for tasks of this project
+			const tasksQuery = query(collection(db, "tasks"), where("projectId", "==", project.id));
+			onSnapshot(tasksQuery, (taskSnap) => {
+				const ul = document.getElementById(`tasks-${project.id}`);
+				ul.innerHTML = ""; // clear
+				taskSnap.docs.forEach((tDoc) => {
+					const t = tDoc.data();
+					const li = document.createElement("li");
+					li.className = "task-item";
+					li.dataset.id = tDoc.id;
+					li.innerHTML = `
+            <span>${t.name}</span>
+            <button class="delete-task">🗑️</button>
+          `;
+					// delete task
+					li.querySelector(".delete-task").onclick = async () => {
+						await taskService.deleteTask(tDoc.id);
+					};
+					ul.appendChild(li);
+				});
 			});
-			if (updateError) {
-				console.error("Error adding user to project:", updateError);
-				return;
-			}
-
-			// Update UI: append new user avatar to list
-			const userListDiv = li.querySelector(".user-list");
-			const u = userProfiles[newUserId];
-			const img = document.createElement("img");
-			img.src = u?.photoURL || "https://via.placeholder.com/24";
-			img.alt = u?.displayName || newUserId;
-			img.title = u?.displayName || newUserId;
-			userListDiv.appendChild(img);
-		}
+		});
 	});
 };
 

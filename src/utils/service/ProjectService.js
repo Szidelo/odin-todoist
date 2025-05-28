@@ -91,7 +91,7 @@ class ProjectService {
 	async deleteProject(id) {
 		try {
 			await deleteDoc(doc(this.collectionRef, id));
-			console.log("Project deleted succes");
+			console.log("Project deleted success");
 			return { success: true };
 		} catch (error) {
 			console.error("Error deleting project:", error);

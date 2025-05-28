@@ -15,12 +15,12 @@ class Project {
 		this.name = name;
 		this.color = color;
 		this.userIds = userIds; // array of user IDs associated with the project
-		this.isFavoriteBy = isFavoriteBy; // array of user IDs who have favorited the project
+		this.isFavoriteBy = isFavoriteBy; // array of user IDs who have favorite the project
 		this.parentProjectId = parentProjectId; // ID of the parent project, if any
 		this.childProjectIds = childProjectIds; // array of IDs of child projects, if any
 		this.createAt = createAt; // timestamp of when the project was created, use firestore server timestamp
 		this.updatedAt = updatedAt; // timestamp of when the project was last updated, use firestore server timestamp
-		this.tasksIds = tasksIds; // array of tasks asociated with the project
+		this.tasksIds = tasksIds; // array of tasks associated with the project
 	}
 
 	getProjectInfo() {
