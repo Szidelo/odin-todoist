@@ -41,18 +41,15 @@ class UserService {
 		try {
 			const { uid, displayName, email, photoURL, preferences } = user;
 			const docRef = this.userRef(uid);
-			setDoc(
-				docRef,
-				{
-					displayName,
-					email,
-					photoURL,
-					preferences,
-					updatedAt: serverTimestamp(),
-					createdAt: user.createdAt || serverTimestamp(),
-				},
-				{ merge: true }
-			);
+			const createdUser = {
+				displayName,
+				email,
+				photoURL,
+				preferences,
+				updatedAt: serverTimestamp(),
+				createdAt: user.createdAt || serverTimestamp(),
+			};
+			setDoc(docRef, createdUser, { merge: true });
 			console.log("User saved to firestore:", this.getUserById(uid));
 			return { success: true };
 		} catch (error) {
@@ -60,6 +57,7 @@ class UserService {
 			return { error };
 		}
 	}
+
 	async getUserByEmail(email) {
 		try {
 			const q = query(collection(db, "users"), where("email", "==", email));

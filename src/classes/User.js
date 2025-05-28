@@ -1,4 +1,4 @@
-import { createUserAvatarFallback } from "../utils/helpers/helpers";
+import helpers from "../utils/helpers/helpers";
 
 class User {
 	constructor(uid, accessToken, displayName, email, photoURL, preferences = {}) {
@@ -6,7 +6,7 @@ class User {
 		this.accessToken = accessToken;
 		this.displayName = displayName;
 		this.email = email;
-		this.photoURL = photoURL || createUserAvatarFallback(displayName || email);
+		this.photoURL = photoURL || helpers.createUserAvatarFallback(displayName || email);
 		this.preferences = preferences;
 	}
 

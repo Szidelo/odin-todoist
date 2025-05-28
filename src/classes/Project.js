@@ -1,5 +1,16 @@
 class Project {
-	constructor(id, name, color, userIds = [], isFavoriteBy = [], parentProjectId = null, childProjectIds = [], createAt, updatedAt) {
+	constructor(
+		id,
+		name,
+		color,
+		userIds = [],
+		isFavoriteBy = [],
+		parentProjectId = null,
+		childProjectIds = [],
+		createAt,
+		updatedAt,
+		tasksIds = []
+	) {
 		this.id = id;
 		this.name = name;
 		this.color = color;
@@ -9,6 +20,7 @@ class Project {
 		this.childProjectIds = childProjectIds; // array of IDs of child projects, if any
 		this.createAt = createAt; // timestamp of when the project was created, use firestore server timestamp
 		this.updatedAt = updatedAt; // timestamp of when the project was last updated, use firestore server timestamp
+		this.tasksIds = tasksIds; // array of tasks asociated with the project
 	}
 
 	getProjectInfo() {
@@ -23,6 +35,10 @@ class Project {
 			createAt: this.createAt,
 			updatedAt: this.updatedAt,
 		};
+	}
+
+	getProjectTasks() {
+		return this.tasksIds;
 	}
 
 	updateProjectInfo(updates = {}) {
