@@ -35,7 +35,15 @@ class TaskService {
 		);
 	}
 
-	async createNewTask({ name, description, dueDate, priority, projectId, parentTaskId = null, taskSectionId = null }) {
+	async createNewTask({
+		name,
+		description,
+		dueDate,
+		priority,
+		projectId,
+		parentTaskId = null,
+		taskSectionId = null,
+	}) {
 		try {
 			const currentUser = await authService.getCurrentUser();
 			if (!currentUser || !currentUser.displayName) {
