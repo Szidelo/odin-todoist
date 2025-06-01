@@ -29,24 +29,16 @@ class TaskService {
 			data.updatedAt,
 			data.assignedTo,
 			data.createdBy,
-			data.taskSectionId,
+			data.sectionId,
 			data.subTasksIds,
 			data.parentTaskId
 		);
 	}
 
-	async createNewTask({
-		name,
-		description,
-		dueDate,
-		priority,
-		projectId,
-		parentTaskId = null,
-		taskSectionId = null,
-	}) {
+	async createNewTask({ name, description, dueDate, priority, projectId, parentTaskId = null, sectionId = null }) {
 		try {
 			const currentUser = await authService.getCurrentUser();
-			if (!currentUser || !currentUser.displayName) {
+			if (!currentUser) {
 				throw new Error("User not authenticated or missing display name");
 			}
 			const newDoc = doc(this.taskRef);
@@ -60,8 +52,8 @@ class TaskService {
 				createdAt: serverTimestamp(),
 				updatedAt: serverTimestamp(),
 				assignedTo: null,
-				createdBy: currentUser.displayName,
-				taskSectionId,
+				createdBy: currentUser.displayName || currentUser.email,
+				sectionId,
 				subTasksIds: [],
 				parentTaskId,
 			};

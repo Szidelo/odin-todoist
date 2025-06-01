@@ -7,6 +7,7 @@ class Project {
 		isFavoriteBy = [],
 		parentProjectId = null,
 		childProjectIds = [],
+		sections = [],
 		createAt,
 		updatedAt,
 		tasksIds = []
@@ -18,6 +19,7 @@ class Project {
 		this.isFavoriteBy = isFavoriteBy; // array of user IDs who have favorite the project
 		this.parentProjectId = parentProjectId; // ID of the parent project, if any
 		this.childProjectIds = childProjectIds; // array of IDs of child projects, if any
+		this.sections = sections; // array of sections within the project
 		this.createAt = createAt; // timestamp of when the project was created, use firestore server timestamp
 		this.updatedAt = updatedAt; // timestamp of when the project was last updated, use firestore server timestamp
 		this.tasksIds = tasksIds; // array of tasks associated with the project
@@ -32,6 +34,7 @@ class Project {
 			isFavoriteBy: this.isFavoriteBy,
 			parentProjectId: this.parentProjectId,
 			childProjectIds: this.childProjectIds,
+			sections: this.sections,
 			createAt: this.createAt,
 			updatedAt: this.updatedAt,
 		};

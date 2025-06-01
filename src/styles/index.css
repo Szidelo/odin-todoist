@@ -106,49 +106,37 @@ body {
 	color: #fff;
 }
 
-/* === Project section === */
-#project-section h3 {
-	margin-top: 0;
-	font-size: 1.25rem;
-}
-
-#project-section h4 {
-	margin: 24px 0 8px;
-	font-size: 1rem;
-	color: var(--text-color);
-}
-
-/* === Project cards === */
+/* === Project Card === */
 .project-card {
 	background: var(--surface-color);
 	border: 1px solid var(--border-color);
 	border-radius: 6px;
 	margin-bottom: 16px;
-	overflow: hidden;
+	padding: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.project-card .project-header {
+/* === Project Header === */
+.project-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 12px 16px;
+	padding: 8px 12px;
 	border-bottom: 1px solid var(--border-color);
 }
 
-.project-card .project-header h4 {
+.project-header h4 {
 	margin: 0;
-	font-size: 1.1rem;
 	color: var(--text-color);
 }
 
-.project-card .project-header button.delete-project {
+.project-header .delete-project {
 	background: transparent;
 	border: none;
-	font-size: 1.1rem;
 	cursor: pointer;
 	color: var(--text-color);
 }
-.project-card .project-header button.delete-project:hover {
+.project-header .delete-project:hover {
 	color: var(--priority-1);
 }
 
@@ -156,29 +144,64 @@ body {
 .user-list {
 	display: flex;
 	gap: 4px;
-	padding: 8px 16px;
+	margin: 8px 12px;
 }
 
 .user-list img {
 	width: 24px;
 	height: 24px;
 	border-radius: 50%;
-	object-fit: cover;
 	border: 1px solid var(--border-color);
 }
 
-/* === Tasks === */
+/* === Sections Container === */
+.sections-container {
+	margin: 8px 12px;
+}
+
+/* === Section Block === */
+.section-block {
+	margin-bottom: 12px;
+	padding: 8px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	background: var(--secundary-background-color);
+}
+
+/* Section Header */
+.section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.section-header h5 {
+	margin: 0;
+	color: var(--text-color);
+}
+
+.section-header .delete-section {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: var(--text-color);
+}
+.section-header .delete-section:hover {
+	color: var(--priority-1);
+}
+
+/* === Task List === */
 .task-list {
 	list-style: none;
-	margin: 0;
-	padding: 0 16px;
+	margin: 8px 0 0 0;
+	padding-left: 16px;
 }
 
 .task-item {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 8px 0;
+	padding: 4px 0;
 	border-bottom: 1px solid var(--border-color);
 }
 
@@ -197,39 +220,85 @@ body {
 	color: var(--priority-1);
 }
 
-/* === Forms === */
-.project-card .task-form,
+/* === “No tasks” placeholder === */
+.no-tasks {
+	font-style: italic;
+	color: var(--muted, #888);
+	padding: 4px 0;
+}
+
+/* === Section Form & Add Section === */
+.section-form,
+.task-form,
 #project-form {
 	display: flex;
 	gap: 8px;
-	padding: 12px 16px;
-	border-top: 1px solid var(--border-color);
-	background: var(--secundary-background-color);
+	margin: 8px 12px;
+	padding: 8px;
+	background: var(--background-color);
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
 }
 
+.section-form input,
 .task-form input,
 #project-form input[type="text"] {
 	flex: 1;
-	padding: 8px;
+	padding: 6px 8px;
 	border: 1px solid var(--border-color);
 	border-radius: 4px;
 	outline: none;
 }
+.section-form input:focus,
 .task-form input:focus,
 #project-form input[type="text"]:focus {
 	border-color: var(--primary-color);
 }
 
+.section-form button,
 .task-form button,
 #project-form button {
 	background: var(--primary-color);
 	border: none;
 	color: #fff;
-	padding: 8px 12px;
+	padding: 6px 12px;
 	border-radius: 4px;
 	cursor: pointer;
 }
+.section-form button:hover,
 .task-form button:hover,
 #project-form button:hover {
+	background: var(--priority-2);
+}
+
+/* Inline Add-Task Form inside sections */
+.task-form-inline {
+	display: flex;
+	gap: 4px;
+	margin-top: 8px;
+}
+
+.task-form-inline input {
+	flex: 1;
+	padding: 4px 6px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	outline: none;
+}
+
+.task-form-inline input:focus {
+	border-color: var(--primary-color);
+}
+
+.task-form-inline button {
+	background: var(--primary-color);
+	border: none;
+	color: #fff;
+	padding: 4px 8px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.task-form-inline button:hover {
 	background: var(--priority-2);
 }

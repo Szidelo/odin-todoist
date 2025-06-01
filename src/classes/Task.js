@@ -11,7 +11,7 @@ class Task {
 		updatedAt,
 		assignedTo,
 		createdBy,
-		taskSectionId = null,
+		sectionId = null,
 		subTasksIds = [],
 		parentTaskId = null
 	) {
@@ -26,7 +26,7 @@ class Task {
 		this.updatedAt = updatedAt;
 		this.assignedTo = assignedTo;
 		this.createdBy = createdBy;
-		this.taskSectionId - taskSectionId;
+		this.sectionId - sectionId;
 		this.subTasksIds = subTasksIds;
 		this.parentTaskId = parentTaskId;
 	}
@@ -44,7 +44,7 @@ class Task {
 			updatedAt: this.updatedAt,
 			assignedTo: this.assignedTo,
 			createdBy: this.createdBy,
-			taskSectionId: this.taskSectionId,
+			sectionId: this.sectionId,
 			subTasksIds: this.subTasksIds,
 			parentTaskId: this.parentTaskId,
 		};
@@ -60,7 +60,7 @@ class Task {
 			"isCompleted",
 			"updatedAt",
 			"assignedTo",
-			"subTasksIds",
+			"sectionId",
 			"parentTaskId",
 		];
 

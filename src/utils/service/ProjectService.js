@@ -1,7 +1,20 @@
-import { collection, doc, getDoc, getDocs, query, where, setDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import {
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	query,
+	where,
+	setDoc,
+	updateDoc,
+	deleteDoc,
+	serverTimestamp,
+	arrayUnion,
+} from "firebase/firestore";
 import { db } from "../../config/firebase";
 import Project from "../../classes/Project";
 import authService from "./AuthService";
+import helpers from "../helpers/helpers";
 
 class ProjectService {
 	constructor() {
@@ -15,8 +28,20 @@ class ProjectService {
 		}
 		const data = docSnap.data();
 		const projectId = docSnap.id;
-		const { name, color, userIds, isFavoriteBy, parentProjectId, childProjectIds, createdAt, updatedAt } = data;
-		const project = new Project(projectId, name, color, userIds, isFavoriteBy, parentProjectId, childProjectIds, createdAt, updatedAt);
+		const { name, color, userIds, isFavoriteBy, parentProjectId, childProjectIds, sections, createdAt, updatedAt } =
+			data;
+		const project = new Project(
+			projectId,
+			name,
+			color,
+			userIds,
+			isFavoriteBy,
+			parentProjectId,
+			childProjectIds,
+			sections || [],
+			createdAt,
+			updatedAt
+		);
 		console.log("Project instance created:", project);
 		return project;
 	}
@@ -32,6 +57,7 @@ class ProjectService {
 				isFavoriteBy,
 				parentProjectId,
 				childProjectIds: [],
+				sections: [],
 				createdAt: serverTimestamp(),
 				updatedAt: serverTimestamp(),
 			};
@@ -84,6 +110,46 @@ class ProjectService {
 			return { project };
 		} catch (error) {
 			console.error("Error updating project:", error);
+			return { error };
+		}
+	}
+
+	async addSection(projectiId, name) {
+		const sectionId = helpers.generateUniqueId();
+		const sectionData = {
+			id: sectionId,
+			name,
+			order: Date.now(),
+		};
+		try {
+			const docRef = doc(this.collectionRef, projectiId);
+			await updateDoc(docRef, {
+				sections: arrayUnion(sectionData),
+			});
+			console.log("Section created:", sectionData);
+			return sectionData.id;
+		} catch (error) {
+			console.error("Error adding section:", error);
+			return { error };
+		}
+	}
+
+	async deleteSection(projectId, sectionId) {
+		try {
+			const { project } = await this.getProjectById(projectId);
+			if (!project || !project.sections) {
+				console.warn("Project or sections not found");
+				throw new Error("Project not found");
+			}
+			const otherSections = project.sections.filter((section) => section.id !== sectionId);
+			await updateDoc(doc(this.collectionRef, projectId), {
+				sections: otherSections,
+			});
+			console.log("Section removed from project:", project, sectionId);
+
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to delete section:", error);
 			return { error };
 		}
 	}

@@ -25,6 +25,10 @@ class Helpers {
 			}
 		});
 	}
+
+	generateUniqueId() {
+		return new Date().toISOString();
+	}
 }
 
 const helpers = new Helpers();
