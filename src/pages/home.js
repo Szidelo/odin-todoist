@@ -4,7 +4,8 @@ import authService from "../utils/service/AuthService";
 import projectService from "../utils/service/ProjectService";
 import taskService from "../utils/service/TaskService.js";
 import userService from "../utils/service/UserService";
-import { createTaskEditModal } from "../components/TestModal.js";
+import { createTaskEditModal } from "../components/modals/task/TestModal.js";
+import { createProjectEditModal } from "../components/modals/project/TestModalProject.js";
 
 const renderHomePage = async () => {
 	const currentUser = await authService.getCurrentUser();
@@ -83,6 +84,7 @@ const renderHomePage = async () => {
 			card.innerHTML = `
         <div class="project-header" style="border-left:4px solid ${project.color}">
           <h4>${project.name}</h4>
+		  <button class="edit-project">Edit Project</button>
           <button class="delete-project">🗑️</button>
         </div>
 
@@ -111,6 +113,11 @@ const renderHomePage = async () => {
 			// Delete project button
 			card.querySelector(".delete-project").onclick = async () => {
 				await projectService.deleteProject(project.id);
+			};
+
+			card.querySelector(".edit-project").onclick = () => {
+				const projectModal = createProjectEditModal();
+				projectModal.open(project.id);
 			};
 
 			// Add Section form handler

@@ -1,0 +1,92 @@
+/* src/components/ProjectEditModal.css */
+
+.project-edit-modal {
+	border: none;
+	padding: 0;
+	background: none;
+}
+.project-edit-modal::backdrop {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal container (dialog) styling */
+.project-edit-modal {
+	background-color: var(--background-color);
+	border-radius: 8px;
+	padding: 24px;
+	max-width: 400px;
+	width: 90%;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	font-family: Inter, sans-serif;
+	position: relative;
+}
+
+/* Close button at top-right */
+.modal-close-btn {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	background: transparent;
+	border: none;
+	font-size: 1.2rem;
+	cursor: pointer;
+	color: var(--text-color);
+}
+
+/* Form inside the modal */
+.project-edit-form {
+	display: flex;
+	flex-direction: column;
+}
+
+/* Title */
+.modal-title {
+	margin-top: 0;
+	margin-bottom: 16px;
+	color: var(--text-color);
+}
+
+/* Labels */
+.form-label {
+	margin-top: 12px;
+	color: var(--text-color);
+}
+
+/* Text inputs */
+.form-input,
+.form-color,
+.form-select,
+.form-textarea {
+	width: 100%;
+	padding: 8px;
+	margin-top: 4px;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	color: var(--text-color);
+	background-color: var(--surface-color);
+}
+
+/* Textarea */
+.form-textarea {
+	resize: vertical;
+}
+
+/* Primary button */
+.btn {
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	text-align: center;
+}
+
+/* Primary action */
+.btn-primary {
+	background-color: var(--primary-color);
+	color: #fff;
+	padding: 10px 16px;
+	margin-top: 16px;
+}
+
+.btn-primary:hover {
+	background-color: var(--priority-2);
+}

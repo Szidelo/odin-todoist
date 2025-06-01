@@ -9,8 +9,7 @@ class Project {
 		childProjectIds = [],
 		sections = [],
 		createAt,
-		updatedAt,
-		tasksIds = []
+		updatedAt
 	) {
 		this.id = id;
 		this.name = name;
@@ -22,7 +21,6 @@ class Project {
 		this.sections = sections; // array of sections within the project
 		this.createAt = createAt; // timestamp of when the project was created, use firestore server timestamp
 		this.updatedAt = updatedAt; // timestamp of when the project was last updated, use firestore server timestamp
-		this.tasksIds = tasksIds; // array of tasks associated with the project
 	}
 
 	getProjectInfo() {
