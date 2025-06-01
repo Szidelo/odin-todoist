@@ -216,6 +216,14 @@ body {
 	cursor: pointer;
 	color: var(--text-color);
 }
+
+.edit-task {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: var(--priority-2);
+	margin-right: 8px;
+}
 .task-item button.delete-task:hover {
 	color: var(--priority-1);
 }

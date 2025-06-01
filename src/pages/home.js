@@ -1,10 +1,10 @@
-// src/pages/home.js
 import { onSnapshot, query, where, collection } from "firebase/firestore";
 import { db } from "../config/firebase";
 import authService from "../utils/service/AuthService";
 import projectService from "../utils/service/ProjectService";
-import taskService from "../utils/service/TaskService.js"; // ← fixed path
+import taskService from "../utils/service/TaskService.js";
 import userService from "../utils/service/UserService";
+import { createTaskEditModal } from "../components/TestModal.js";
 
 const renderHomePage = async () => {
 	const currentUser = await authService.getCurrentUser();
@@ -153,11 +153,20 @@ const renderHomePage = async () => {
 						li.dataset.id = t.id;
 						li.innerHTML = `
               <span>${t.name}</span>
+			  <button class="edit-task">Edit</button>
               <button class="delete-task">🗑️</button>
             `;
 						// Delete task button
 						li.querySelector(".delete-task").onclick = async () => {
 							await taskService.deleteTask(t.id);
+						};
+
+						ul.appendChild(li);
+						//Edit task btn
+						li.querySelector(".edit-task").onclick = () => {
+							const taskModal = createTaskEditModal();
+							console.log("++++++++++++Edit");
+							taskModal.open(t.id);
 						};
 						ul.appendChild(li);
 					});

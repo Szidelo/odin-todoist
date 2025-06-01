@@ -1,4 +1,4 @@
-import { collection, deleteDoc, getDoc, doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, getDoc, doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import Task from "../../classes/Task";
 import authService from "./AuthService";
@@ -74,6 +74,40 @@ class TaskService {
 			return { task };
 		} catch (error) {
 			console.error("Failed to get task by id:", id, error);
+			return { error };
+		}
+	}
+
+	async updateTask(id, updates) {
+		try {
+			const docRef = doc(this.taskRef, id);
+			const toBeUpdated = {
+				...updates,
+				updatedAt: serverTimestamp(),
+			};
+			await updateDoc(docRef, toBeUpdated);
+			console.log("Task updated succesfull:", toBeUpdated);
+			return { success: true };
+		} catch (error) {
+			console.error("Failed to update task:", error);
+			return { error };
+		}
+	}
+
+	async setTaskComplete(id) {
+		try {
+			const docRef = doc(this.taskRef, id);
+			const snap = await getDoc(docRef);
+			const current = snap.data();
+			const toBeUpdated = {
+				isCompleted: !current.isCompleted,
+				updatedAt: serverTimestamp(),
+			};
+			await updateDoc(docRef, toBeUpdated);
+			console.log("Task isCompleted value changed");
+			return { success: true };
+		} catch (error) {
+			console.error("Error setting the task completion:", error);
 			return { error };
 		}
 	}
