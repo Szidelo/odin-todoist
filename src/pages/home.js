@@ -254,6 +254,7 @@ const renderHomePage = async () => {
 						headerDiv.className = "section-header";
 						headerDiv.innerHTML = `
               <h5>${sec.name}</h5>
+			  <button class="rename-section">Rename</button>
               <button class="delete-section" data-section="${sec.id}">🗑️</button>
             `;
 						secDiv.appendChild(headerDiv);
@@ -263,6 +264,11 @@ const renderHomePage = async () => {
 						deleteBtn.onclick = async () => {
 							console.log("Deleting section:", project.id, sec.id);
 							await projectService.deleteSection(project.id, sec.id);
+						};
+
+						const renameBtn = headerDiv.querySelector(".rename-section");
+						renameBtn.onclick = async () => {
+							await projectService.renameSection(project.id, sec.id, "Testing");
 						};
 
 						// If tasks exist in this section, render them + inline form

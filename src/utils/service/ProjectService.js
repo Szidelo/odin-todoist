@@ -15,6 +15,7 @@ import { db } from "../../config/firebase";
 import Project from "../../classes/Project";
 import authService from "./AuthService";
 import helpers from "../helpers/helpers";
+import { tr } from "date-fns/locale";
 
 class ProjectService {
 	constructor() {
@@ -130,6 +131,42 @@ class ProjectService {
 			return sectionData.id;
 		} catch (error) {
 			console.error("Error adding section:", error);
+			return { error };
+		}
+	}
+
+	async getSectionById(projectId, sectionId) {
+		try {
+			const { project, error } = await this.getProjectById(projectId);
+			if (error) throw error;
+
+			const section = project.sections.find((section) => section.id === sectionId);
+
+			return { section };
+		} catch (error) {
+			console.error("Error getting section by id:", error);
+			return { error };
+		}
+	}
+
+	async renameSection(projectId, sectionId, newName) {
+		try {
+			const ref = doc(this.collectionRef, projectId);
+			const projectsSnap = await getDoc(ref);
+			if (!projectsSnap.exists()) {
+				console.warn("Project not found!");
+				throw new Error("Project not found!");
+			}
+			const sections = projectsSnap.data().sections || [];
+			const updated = sections.map((section) =>
+				section.id === sectionId ? { ...section, name: newName } : section
+			);
+			await updateDoc(ref, {
+				sections: updated,
+				updatedAt: serverTimestamp(),
+			});
+		} catch (error) {
+			console.error("Error changeing the name of the section:", error);
 			return { error };
 		}
 	}
