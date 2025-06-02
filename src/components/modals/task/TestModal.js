@@ -81,19 +81,31 @@ export function createTaskEditModal() {
 	dueDateInput.className = "form-input";
 	form.appendChild(dueDateInput);
 
-	// — Move To (project select)
+	// — Move To Project
 	const moveToLabel = document.createElement("label");
-	moveToLabel.textContent = "Move To:";
+	moveToLabel.textContent = "Move To Project:";
 	moveToLabel.htmlFor = "edit-task-move-to";
 	moveToLabel.className = "form-label";
 	form.appendChild(moveToLabel);
 
 	const moveToSelect = document.createElement("select");
 	moveToSelect.id = "edit-task-move-to";
-	moveToSelect.name = "moveTo";
+	moveToSelect.name = "moveToProject";
 	moveToSelect.className = "form-select";
 	form.appendChild(moveToSelect);
-	// We will populate this <select> when `open()` is called.
+
+	// — Move To Section
+	const moveToSectionLabel = document.createElement("label");
+	moveToSectionLabel.textContent = "Move To Section:";
+	moveToSectionLabel.htmlFor = "edit-task-section";
+	moveToSectionLabel.className = "form-label";
+	form.appendChild(moveToSectionLabel);
+
+	const sectionSelect = document.createElement("select");
+	sectionSelect.id = "edit-task-section";
+	sectionSelect.name = "moveToSection";
+	sectionSelect.className = "form-select";
+	form.appendChild(sectionSelect);
 
 	// — Priority
 	const priorityLabel = document.createElement("label");
@@ -140,7 +152,7 @@ export function createTaskEditModal() {
 	submitButton.className = "btn btn-primary";
 	form.appendChild(submitButton);
 
-	// Close button
+	// — Close button
 	const closeButton = document.createElement("button");
 	closeButton.type = "button";
 	closeButton.textContent = "✖";
@@ -168,27 +180,26 @@ export function createTaskEditModal() {
 		const updatedPriority = parseInt(prioritySelect.value, 10);
 		const updatedCompleted = completeCheckbox.checked;
 
-		// Determine which project we moved to
-		const selectedOption = moveToSelect.selectedOptions[0];
-		const newProjectId = selectedOption ? selectedOption.value : null;
+		// Selected project ID
+		const newProjId = moveToSelect.value;
+		// Selected section ID ("" means no-section)
+		const newSecId = sectionSelect.value || null;
 
 		const updates = {
 			name: updatedName,
 			description: updatedDesc,
 			priority: updatedPriority,
 			isCompleted: updatedCompleted,
-			updatedAt: null, // serverTimestamp will be set inside updateTask
+			updatedAt: null, // serverTimestamp in updateTask
 		};
-		if (updatedDueDate) {
-			updates.dueDate = updatedDueDate;
-		} else {
-			updates.dueDate = null;
-		}
+		if (updatedDueDate) updates.dueDate = updatedDueDate;
+		else updates.dueDate = null;
 
-		// 1) If user changed the project, update the projectId in Firestore
-		if (newProjectId && newProjectId !== form.dataset.currentProject) {
-			updates.projectId = newProjectId;
+		if (newProjId && newProjId !== form.dataset.currentProject) {
+			updates.projectId = newProjId;
 		}
+		// Only set section if project didn’t change, or if it did, we still apply section
+		updates.sectionId = newSecId;
 
 		const result = await taskService.updateTask(taskId, updates);
 		if (result.error) {
@@ -199,7 +210,7 @@ export function createTaskEditModal() {
 	};
 
 	/**
-	 * Fetches a task by ID, populates the form, and opens the dialog.
+	 * Opens modal for given taskId, populates fields and selects.
 	 * @param {string} taskId
 	 */
 	async function open(taskId) {
@@ -211,10 +222,10 @@ export function createTaskEditModal() {
 				return;
 			}
 
-			// 2) Fetch task details
+			// 2) Fetch task
 			const { task, error: taskError } = await taskService.getTaskById(taskId);
 			if (taskError || !task) {
-				console.error("Failed to fetch task for editing:", taskError);
+				console.error("Failed to fetch task:", taskError);
 				return;
 			}
 
@@ -234,16 +245,15 @@ export function createTaskEditModal() {
 			prioritySelect.value = String(task.priority || 4);
 			completeCheckbox.checked = Boolean(task.isCompleted);
 
-			// 4) Populate the “Move To” <select> with this user’s projects
-			//    First clear existing options
+			// 4) Populate “Move To Project” list
 			moveToSelect.innerHTML = "";
 			const { projects, error: projError } = await projectService.listProjectsForUser(currentUser.uid);
 			if (projError) {
-				console.error("Error fetching projects for Move To:", projError);
+				console.error("Error fetching projects:", projError);
 			} else {
 				projects.forEach((proj) => {
 					const opt = document.createElement("option");
-					opt.value = proj.id; // store projectId in value
+					opt.value = proj.id; // projectId
 					opt.textContent = proj.name;
 					if (proj.id === task.projectId) {
 						opt.selected = true;
@@ -252,10 +262,34 @@ export function createTaskEditModal() {
 				});
 			}
 
-			// Store the current projectId in form.dataset so we can detect changes on submit
+			// 5) Populate “Move To Section” list based on current project
+			sectionSelect.innerHTML = "";
+			// "No Section" option
+			const noneOpt = document.createElement("option");
+			noneOpt.value = "";
+			noneOpt.textContent = "No Section";
+			if (!task.sectionId) noneOpt.selected = true;
+			sectionSelect.appendChild(noneOpt);
+
+			// Fetch project to get its sections
+			const { project, error: prjError } = await projectService.getProjectById(task.projectId);
+			if (prjError || !project) {
+				console.error("Error fetching project for sections:", prjError);
+			} else {
+				project.sections.forEach((sec) => {
+					const opt = document.createElement("option");
+					opt.value = sec.id;
+					opt.textContent = sec.name;
+					if (sec.id === task.sectionId) {
+						opt.selected = true;
+					}
+					sectionSelect.appendChild(opt);
+				});
+			}
+
+			// Store the current projectId in dataset
 			form.dataset.currentProject = task.projectId;
 
-			// Finally, show the dialog
 			dialog.showModal();
 		} catch (err) {
 			console.error("Error opening task-edit modal:", err);
